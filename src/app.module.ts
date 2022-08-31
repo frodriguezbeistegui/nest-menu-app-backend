@@ -1,8 +1,10 @@
-import { Module } from '@nestjs/common';
+import { Module, ValidationPipe } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
+import { UsersModule } from './users/users.module';
+import { APP_PIPE } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -11,14 +13,23 @@ import { ConfigModule } from '@nestjs/config';
       envFilePath: 'config.env',
     }),
     MongooseModule.forRoot(
-      `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.a3ryeu7.mongodb.net/?retryWrites=true&w=majority`,
+      `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@${process.env.DB_CONFIG}`,
       {
         useNewUrlParser: true,
         useUnifiedTopology: true,
       },
     ),
+    UsersModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_PIPE,
+      useValue: new ValidationPipe({
+        whitelist: true,
+      }),
+    },
+  ],
 })
 export class AppModule {}

@@ -1,24 +1,22 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Exclude } from 'class-transformer';
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 
 export type UserDocument = User & Document;
 
-@Schema()
+@Schema({ toJSON: { virtuals: true }, toObject: { virtuals: true } })
 export class User {
-  @Prop()
-  name: string;
 
   @Prop()
-  @Exclude()
-  password: string;
+  name!: string;
 
   @Prop()
-  email: string;
+  password!: string;
 
-  @Prop({ default: 'user', select: false })
-  @Exclude()
-  role: string;
+  @Prop()
+  email!: string;
+
+  @Prop({ default: 'user' })
+  role?: 'string' | 'admin';
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

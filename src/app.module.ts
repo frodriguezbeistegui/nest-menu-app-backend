@@ -14,10 +14,6 @@ import { APP_PIPE } from '@nestjs/core';
     }),
     MongooseModule.forRoot(
       `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@${process.env.DB_CONFIG}`,
-      {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-      },
     ),
     UsersModule,
   ],

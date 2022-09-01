@@ -1,20 +1,20 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId } from 'mongoose';
-import { User, UserDocument } from './user.schema';
+import { User } from './user.schema';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel('users') private UserRepo: Model<UserDocument>) {}
+  constructor(@InjectModel(User.name) private readonly UserRepo: Model<User>) {}
 
-  async findAll(email: string) {
+  async findAll() {
     let users;
-    if (email) {
-      users = await this.UserRepo.find({ email });
-    } else {
-      users = await this.UserRepo.find();
-    }
+    users = await this.UserRepo.find();
     return users;
+  }
+
+  findByEmail(email: string) {
+    return this.UserRepo.find({ email });
   }
 
   create(name: string, email: string, password: string) {
@@ -25,9 +25,10 @@ export class UsersService {
     return user;
   }
 
-  findById(id: ObjectId) {
-    const user = this.UserRepo.findById(id);
-    if (!user) {
+  async findById(id: ObjectId) {
+    const user = await this.UserRepo.findById(id);
+    console.log(user);
+    if (!user?._id) {
       throw new NotFoundException('User not found, try again later!');
     }
     return user;
@@ -35,10 +36,10 @@ export class UsersService {
 
   async update(id: ObjectId, atts: Partial<User>) {
     const user = await this.UserRepo.findOneAndUpdate(id, atts);
-    if (!user) {
+    if (!user?._id) {
       throw new NotFoundException('User not found');
     }
-    return Object.assign(user, atts);
+    return user;
   }
 
   async delete(id: ObjectId) {

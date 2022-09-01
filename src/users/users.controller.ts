@@ -7,15 +7,18 @@ import {
   Patch,
   Post,
   Query,
+  UseInterceptors,
 } from '@nestjs/common';
-import { get } from 'http';
 import { ObjectId } from 'mongoose';
 import { AuthService } from './auth.service';
-import { UserDto } from './dtos/create-user.dto';
-import { User } from './user.schema';
+import { CreateUserDto } from './dtos/create-user.dto';
+import { User, UserDocument } from './user.schema';
 import { UsersService } from './users.service';
+import { Serialize } from '../interceptors/serialize.interceptor';
+import { UserDto } from './dtos/user.dto';
 
 @Controller('users')
+@Serialize(UserDto)
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
@@ -23,7 +26,7 @@ export class UsersController {
   ) {}
 
   @Post('/signup')
-  signup(@Body() body: UserDto) {
+  signup(@Body() body: CreateUserDto) {
     return this.authService.signUp(body);
   }
 
@@ -33,8 +36,8 @@ export class UsersController {
   }
 
   @Get()
-  async getAllUsers(@Query('email') email: string) {
-    const users: any = await this.usersService.findAll(email);
+  async getAllUsers() {
+    const users = await this.usersService.findAll();
     return users;
   }
 

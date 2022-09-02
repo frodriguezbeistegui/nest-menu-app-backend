@@ -27,7 +27,6 @@ export class UsersService {
 
   async findById(id: ObjectId) {
     const user = await this.UserRepo.findById(id);
-    console.log(user);
     if (!user?._id) {
       throw new NotFoundException('User not found, try again later!');
     }

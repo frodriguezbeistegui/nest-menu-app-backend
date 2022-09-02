@@ -6,16 +6,17 @@ import {
   Param,
   Patch,
   Post,
-  Query,
-  UseInterceptors,
+  Request,
+  UseGuards,
 } from '@nestjs/common';
 import { ObjectId } from 'mongoose';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dtos/create-user.dto';
-import { User, UserDocument } from './user.schema';
+import { User } from './user.schema';
 import { UsersService } from './users.service';
 import { Serialize } from '../interceptors/serialize.interceptor';
 import { UserDto } from './dtos/user.dto';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('users')
 @Serialize(UserDto)
@@ -28,6 +29,12 @@ export class UsersController {
   @Post('/signup')
   signup(@Body() body: CreateUserDto) {
     return this.authService.signUp(body);
+  }
+
+  @UseGuards(AuthGuard('local'))
+  @Post('login')
+  async login(@Request() req: any) {
+    return req.user;
   }
 
   @Post('/signin')

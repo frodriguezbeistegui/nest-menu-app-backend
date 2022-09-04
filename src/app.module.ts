@@ -27,5 +27,7 @@ import { APP_PIPE } from '@nestjs/core';
       }),
     },
   ],
+  exports: [ConfigModule]
 })
 export class AppModule {}
+

@@ -32,15 +32,18 @@ export class UsersController {
   }
 
   @UseGuards(AuthGuard('local'))
-  @Post('login')
+  @Post('/login')
   async login(@Request() req: any) {
-    return req.user;
+    const user = req.user._doc;
+    user.id = user._id.toString();
+    console.log(user)
+    return this.authService.loginWithCredentials(user);
   }
 
-  @Post('/signin')
-  signin(@Body('email') email: string, @Body('password') password: string) {
-    return this.authService.signIn(email, password);
-  }
+  // @Post('/signin')
+  // signin(@Body('email') email: string, @Body('password') password: string) {
+  //   return this.authService.validateUser(email, password);
+  // }
 
   @Get()
   async getAllUsers() {
@@ -50,7 +53,7 @@ export class UsersController {
 
   @Get('/:id')
   getById(@Param('id') id: ObjectId) {
-    return this.usersService.findById(id);
+    return this.usersService.findWIthId(id);
   }
 
   @Patch('/:id')

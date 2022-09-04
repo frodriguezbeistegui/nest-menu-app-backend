@@ -28,10 +28,12 @@ export class SerializeInterceptor implements NestInterceptor {
 
     return next.handle().pipe(
       map((data: any) => {
-        console.log(data)
+        // console.log(data);
         // Run something before the response is sent out
         return plainToInstance(this.dto, data, {
           excludeExtraneousValues: true,
+          exposeDefaultValues: true,
+        
         });
       }),
     );

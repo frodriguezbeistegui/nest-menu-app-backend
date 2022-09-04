@@ -13,7 +13,7 @@ export class UsersService {
     return users;
   }
 
-  findByEmail(email: string) {
+  findOne(email: string) {
     return this.UserRepo.find({ email });
   }
 
@@ -25,9 +25,10 @@ export class UsersService {
     return user;
   }
 
-  async findById(id: ObjectId) {
-    const user = await this.UserRepo.findById(id);
-    if (!user?._id) {
+  async findWIthId(id: ObjectId) {
+    const user = await this.UserRepo.findById(id)
+
+    if (!user) {
       throw new NotFoundException('User not found, try again later!');
     }
     return user;
@@ -38,7 +39,8 @@ export class UsersService {
     if (!user?._id) {
       throw new NotFoundException('User not found');
     }
-    return user;
+    return Object.assign(user, atts)
+   
   }
 
   async delete(id: ObjectId) {

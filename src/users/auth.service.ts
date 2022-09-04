@@ -29,7 +29,7 @@ export class AuthService {
     if (password !== passwordConfirm) {
       throw new BadRequestException('Passwords do not match');
     }
-    const users = await this.usersService.findByEmail(email);
+    const users = await this.usersService.findOne(email);
     if (users.length) {
       throw new BadRequestException('Email in use');
     }
@@ -43,25 +43,26 @@ export class AuthService {
     return user;
   }
 
-  async signIn(email: string, password: string) {
-    const [user] = await this.usersService.findByEmail(email);
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-    const [salt, storedHash] = user.password.split('%');
+  async validateUser(email: string, password: string) {
+    const [user] = await this.usersService.findOne(email);
 
+    if (!user) {
+      return null;
+    }
+
+    const [salt, storedHash] = user.password.split('%');
     const hash = (await scrypt(password, salt, 32)) as Buffer;
 
-    if (storedHash !== hash.toString('hex')) {
-      throw new BadRequestException('Wrong password');
+    if (storedHash === hash.toString('hex')) {
+      const { password, ...result } = user;
+
+      return result;
     }
-    return user;
+    return null;
   }
 
   async loginWithCredentials(user: any) {
-    const payload = { email: user.email, id: user.id! };
-    return {
-      access_token: this.jwtService.sign(payload),
-    };
+    const payload = { email: user.email, sub: user.id };
+    return { access_token: this.jwtService.sign(payload) };
   }
 }
